@@ -1,16 +1,16 @@
 // YOUR CODE HERE:
 var app = {
   server: "https://api.parse.com/1/classes/chatterbox",
-  initialMessageCount: 10,
+  initialMessageCount: 25,
   lastMessageID: undefined,
   rooms: {
-    lobby:"lobby"
+    Lobby:"Lobby"
   }
 };
 
 var user = {
   username: location.search.split("username=")[1],
-  room: "lobby",
+  room: "Lobby",
   friendsList: {}
 };
 
@@ -18,6 +18,16 @@ var user = {
 app.init = function(){
   $(document).ready(function(){
     setInterval(app.fetch, 2000);
+
+    $("#roomSelect").on("click", ".room", function(){
+      user.room = $(this).text();
+      $(".currentRoom").removeClass().addClass("room");
+      $(this).removeClass().addClass("currentRoom");
+      app.changeRoom(user.room);
+      // console.log(user.room);
+    });
+
+
   });
 };
 
@@ -56,10 +66,6 @@ app.addEventListeners = function() {
   $(".username").on("click", function(){
     var userName = $(this).text();
     app.addFriend(userName);
-  });
-
-  $(".room").on("click", function(){
-    console.log("li");
   });
 };
 
@@ -105,11 +111,19 @@ app.escapeString = function(string) {
 };
 
 app.addMessage = function(message){
-  var user = "<span class='username'>" + app.escapeString(message.username) + "</span>";
+  var userName = "<span class='username'>" + app.escapeString(message.username) + "</span>";
   var text = "<span id='message'>" + app.escapeString(message.text) + "</span>";
+  console.log(message.roomname,user.room);
+  if(app.escapeString(user.room) === "Lobby"){
+    $("#chats").prepend("<div>"+ userName + ": " + text + "</div>");
+  } else {
+    console.log(message.roomname, user.room);
+    if(app.escapeString(message.roomname) === user.room){
+      $("#chats").prepend("<div>"+ userName + ": " + text + "</div>");
+    }
+  }
   // var room = "<span class='room'>" + message.room + "</span>";
 
-  $("#chats").prepend("<div>"+ user + ": " + text + "</div>");
 };
 
 app.clearMessages = function(){
@@ -118,11 +132,18 @@ app.clearMessages = function(){
 
 app.addRoom = function(lobbyName){
   //if room does not exist
+  lobbyName = app.escapeString(lobbyName);
   if (!app.rooms[lobbyName] && lobbyName !== undefined && lobbyName !== "") {
     $("#roomSelect").append("<div class='room'>" + lobbyName + "</div>");
     app.rooms[lobbyName] = lobbyName;
   }
 };
+
+app.changeRoom = function(roomName) {
+  app.clearMessages();
+  app.lastMessageID = undefined;
+  app.fetch();
+}
 
 app.addFriend = function(friend){
   // var friend = event.data.friendName;
