@@ -6,7 +6,7 @@ body {
 }
 
 #main {
-    width: 600px;
+    width: 800px;
     height: 600px;
     margin: auto;
     text-align: left;
@@ -48,9 +48,6 @@ body {
     line-height: 13px;
 }
 
-h3 {
-    float: right;
-}
 
 form {
     padding: 20px;
@@ -70,12 +67,15 @@ form input[type=text] {
     margin-bottom: 5px;
     margin-right: 0px;
     background-color: #eee;
-    width:400px;
-    height:400px;
+    width:500px;
+    height:450px;
     float:left;
     overflow:auto;
 }
 
+.roomContainer{
+    margin:10px 0px;
+}
 .currentRoom {
     color:red;
 }
@@ -90,6 +90,8 @@ form input[type=text] {
 
 #roomSelect {
     float:right;
+    width: 250px;
+    margin: auto;
 }
 .friend {
     font-weight: bold;

@@ -8,7 +8,6 @@
     <!-- dependencies -->
     <script src="bower_components/jquery/jquery.min.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
-    <script src="bower_components/Sanitize.js/lib/sanitize.js"></script>
     <!-- your scripts -->
     <script src="scripts/config.js"></script>
     <script src="scripts/app.js"></script>
@@ -22,9 +21,13 @@
       </form>
       <!-- Your HTML goes here! -->
       <div id="chats"></div>
-      <h3>Room Select</h3>
       <div id="roomSelect">
-        <div class="currentRoom">Lobby</div>
+        <h3>Room Select</h3>
+        <input type="text" class="addRoom"></input>
+        <input type="button" value="Submit" class="submitNewRoom"></input>
+        <div class="roomContainer">
+          <div class="currentRoom">Lobby</div>
+        </div>
       </div>
     </div>
   </body>

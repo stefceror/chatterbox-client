@@ -21,12 +21,17 @@ app.init = function(){
 
     $("#roomSelect").on("click", ".room", function(){
       user.room = $(this).text();
-      $(".currentRoom").removeClass().addClass("room");
-      $(this).removeClass().addClass("currentRoom");
-      app.changeRoom(user.room);
+      app.changeRoom($(this));
       // console.log(user.room);
     });
 
+    $(".submitNewRoom").on("click", function() {
+      console.log("clicky");
+      var newRoom = $(".addRoom").val();
+      app.addRoom(newRoom);
+      user.room = newRoom;
+      app.changeRoom($(".room:contains(" + newRoom + ")"));
+    });
 
   });
 };
@@ -50,6 +55,7 @@ app.send = function(message){
 
 app.fetch = function(){
   //submit a get request via ajax
+  //maybe filter by room
   $.ajax({
     url: app.server,
     type: "GET",
@@ -113,17 +119,14 @@ app.escapeString = function(string) {
 app.addMessage = function(message){
   var userName = "<span class='username'>" + app.escapeString(message.username) + "</span>";
   var text = "<span id='message'>" + app.escapeString(message.text) + "</span>";
-  console.log(message.roomname,user.room);
+
   if(app.escapeString(user.room) === "Lobby"){
     $("#chats").prepend("<div>"+ userName + ": " + text + "</div>");
   } else {
-    console.log(message.roomname, user.room);
     if(app.escapeString(message.roomname) === user.room){
       $("#chats").prepend("<div>"+ userName + ": " + text + "</div>");
     }
   }
-  // var room = "<span class='room'>" + message.room + "</span>";
-
 };
 
 app.clearMessages = function(){
@@ -134,14 +137,16 @@ app.addRoom = function(lobbyName){
   //if room does not exist
   lobbyName = app.escapeString(lobbyName);
   if (!app.rooms[lobbyName] && lobbyName !== undefined && lobbyName !== "") {
-    $("#roomSelect").append("<div class='room'>" + lobbyName + "</div>");
+    $("#roomSelect .roomContainer").append("<div class='room'>" + lobbyName + "</div>");
     app.rooms[lobbyName] = lobbyName;
   }
 };
 
-app.changeRoom = function(roomName) {
+app.changeRoom = function(roomClicked) {
   app.clearMessages();
   app.lastMessageID = undefined;
+  $(".currentRoom").removeClass().addClass("room");
+  $(roomClicked).removeClass().addClass("currentRoom");
   app.fetch();
 }
 
@@ -158,7 +163,7 @@ app.handleSubmit = function(){
   var message = {
     username: user.username,
     text: $("input.sendText").val(),
-    room: user.room
+    roomname: user.room
   };
 
   //pass built message to send
