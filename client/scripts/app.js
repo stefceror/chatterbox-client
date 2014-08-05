@@ -14,6 +14,17 @@ var user = {
   friendsList: {}
 };
 
+user.toggleFriend = function(friend){
+  if (!user.friendsList[friend]) {
+    user.friendsList[friend] = friend;
+  } else {
+    delete user.friendsList[friend];
+  }
+
+  // toggle friends list on DOM
+  app.toggleFriend(friend);
+};
+
 //fetch initial messages, display them, kickoff fetch loop
 app.init = function(){
   $(document).ready(function(){
@@ -73,13 +84,10 @@ app.addEventListeners = function() {
   // adds friend and styles messages
   $("#chats").on("click", ".username", function(){
     var userName = $(this).text();
-    app.addFriend(userName);
+    user.toggleFriend(userName);
+    // app.addFriend(userName);
     app.styleFriend($(".username:contains(" + userName + ")"));
   });
-
-  //
-
-
 };
 
 app.findLastMessageIndex = function(messages){
@@ -155,16 +163,17 @@ app.changeRoom = function(roomClicked) {
   app.fetch();
 }
 
-app.addFriend = function(friend){
-  // var friend = event.data.friendName;
-  if (!user.friendsList[friend]) {
-    user.friendsList[friend] = friend;
+app.toggleFriend = function(friend) {
+  if (user.friendsList[friend]) {
+    $("#friendsList").append("<div class='inFriendsList'>" + friend + "</div>");
+  } else {
+    $(".inFriendsList:contains(" + friend + ")").remove();
   }
-};
+}
 
 // maybe remove friend if already a friend
 app.styleFriend = function(friendSelector) {
-  friendSelector.addClass("friend");
+  friendSelector.toggleClass("friend");
 }
 
 app.handleSubmit = function(){
