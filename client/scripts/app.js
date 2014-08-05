@@ -1,4 +1,3 @@
-// YOUR CODE HERE:
 var app = {
   server: "https://api.parse.com/1/classes/chatterbox",
   initialMessageCount: 25,
@@ -15,7 +14,7 @@ var user = {
 };
 
 user.toggleFriend = function(friend){
-  if (!user.friendsList[friend]) {
+  if (!user.friendsList[friend] && user.username !== friend) {
     user.friendsList[friend] = friend;
   } else {
     delete user.friendsList[friend];
@@ -29,39 +28,8 @@ user.toggleFriend = function(friend){
 app.init = function(){
   $(document).ready(function(){
     app.addEventListeners();
+    app.fetch();
     setInterval(app.fetch, 2000);
-  });
-};
-
-app.send = function(message){
-  //send a message
-  $.ajax({
-    url: app.server,
-    type: "POST",
-    data: JSON.stringify(message),
-    dataType:"json",
-    contentType: "application/json",
-    success: function(data){
-      console.log(data);
-    },
-    failure: function(data){
-      console.log('Message not sent');
-    }
-  });
-};
-
-app.fetch = function(){
-  //submit a get request via ajax
-  //maybe filter by room
-  $.ajax({
-    url: app.server,
-    type: "GET",
-    contentType: "jsonp",
-    data: { order: "-createdAt" },
-    success: app.addNewDOMElements,
-    failure: function(data) {
-      console.log("fetch failed");
-    }
   });
 };
 
@@ -81,15 +49,30 @@ app.addEventListeners = function() {
     app.changeRoom($(".room:contains(" + newRoom + ")"));
   });
 
-  // adds friend and styles messages
+  // toggles friend and styles messages
   $("#chats").on("click", ".username", function(){
     var userName = $(this).text();
     user.toggleFriend(userName);
-    // app.addFriend(userName);
     app.styleFriend($(".username:contains(" + userName + ")"));
   });
 };
 
+//submit a get request via ajax
+app.fetch = function(){
+  //maybe filter by room
+  $.ajax({
+    url: app.server,
+    type: "GET",
+    contentType: "jsonp",
+    data: { order: "-createdAt" },
+    success: app.addNewDOMElements,
+    failure: function(data) {
+      console.log("fetch failed");
+    }
+  });
+};
+
+// helper function for app.fetch
 app.findLastMessageIndex = function(messages){
   var index = 0;
   for(var i = 0; i < messages.length; i++){
@@ -120,16 +103,11 @@ app.addNewDOMElements = function(data) {
 
   // update last message
   app.lastMessageID = messages[0].objectId;
-}
-
-app.escapeString = function(string) {
-  if(string){
-    return string.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
 };
 
 app.addMessage = function(message){
-  var classes = user.friendsList[message.username] ? "username friend" : "username";
+  var classes = user.username === message.username ? "username self" :
+                (user.friendsList[message.username] ? "username friend" : "username");
   var userName = "<span class='" + classes + "''>" + app.escapeString(message.username) + "</span>";
   var text = "<span id='message'>" + app.escapeString(message.text) + "</span>";
 
@@ -139,6 +117,13 @@ app.addMessage = function(message){
     if(app.escapeString(message.roomname) === user.room){
       $("#chats").prepend("<div>"+ userName + ": " + text + "</div>");
     }
+  }
+};
+
+// helper function for app.addMessage
+app.escapeString = function(string) {
+  if(string){
+    return string.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 };
 
@@ -161,20 +146,7 @@ app.changeRoom = function(roomClicked) {
   $(".currentRoom").removeClass().addClass("room");
   $(roomClicked).removeClass().addClass("currentRoom");
   app.fetch();
-}
-
-app.toggleFriend = function(friend) {
-  if (user.friendsList[friend]) {
-    $("#friendsList").append("<div class='inFriendsList'>" + friend + "</div>");
-  } else {
-    $(".inFriendsList:contains(" + friend + ")").remove();
-  }
-}
-
-// maybe remove friend if already a friend
-app.styleFriend = function(friendSelector) {
-  friendSelector.toggleClass("friend");
-}
+};
 
 app.handleSubmit = function(){
   //build message to send
@@ -188,5 +160,33 @@ app.handleSubmit = function(){
   app.send(message);
 };
 
+app.send = function(message){
+  //send a message
+  $.ajax({
+    url: app.server,
+    type: "POST",
+    data: JSON.stringify(message),
+    dataType:"json",
+    contentType: "application/json",
+    success: function(data){
+      console.log(data);
+    },
+    failure: function(data){
+      console.log('Message not sent');
+    }
+  });
+};
+
+app.toggleFriend = function(friend) {
+  if (user.friendsList[friend]) {
+    $("#friendsList").append("<div class='inFriendsList'>" + friend + "</div>");
+  } else {
+    $(".inFriendsList:contains(" + friend + ")").remove();
+  }
+}
+
+app.styleFriend = function(friendSelector) {
+  friendSelector.toggleClass("friend");
+}
 
 app.init();

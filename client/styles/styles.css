@@ -85,6 +85,10 @@ form input[type=text] {
     font-weight: bold;
 }
 
+.self {
+    color: LightCoral;
+}
+
 #chats .username {
     font-weight: 800;
 }
