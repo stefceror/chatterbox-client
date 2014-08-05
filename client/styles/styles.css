@@ -77,7 +77,11 @@ form input[type=text] {
     margin:10px 0px;
 }
 .currentRoom {
-    color:red;
+    color: MediumPurple;
+}
+
+.friend {
+    color: CornflowerBlue;
 }
 
 #chats .username {

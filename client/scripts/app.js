@@ -17,22 +17,8 @@ var user = {
 //fetch initial messages, display them, kickoff fetch loop
 app.init = function(){
   $(document).ready(function(){
+    app.addEventListeners();
     setInterval(app.fetch, 2000);
-
-    $("#roomSelect").on("click", ".room", function(){
-      user.room = $(this).text();
-      app.changeRoom($(this));
-      // console.log(user.room);
-    });
-
-    $(".submitNewRoom").on("click", function() {
-      console.log("clicky");
-      var newRoom = $(".addRoom").val();
-      app.addRoom(newRoom);
-      user.room = newRoom;
-      app.changeRoom($(".room:contains(" + newRoom + ")"));
-    });
-
   });
 };
 
@@ -69,10 +55,31 @@ app.fetch = function(){
 };
 
 app.addEventListeners = function() {
-  $(".username").on("click", function(){
+  // changes room when clicked on
+  $("#roomSelect").on("click", ".room", function(){
+    user.room = $(this).text();
+    app.changeRoom($(this));
+  });
+
+  // adds new room to the list and activates it
+  $(".submitNewRoom").on("click", function() {
+    console.log("clicky");
+    var newRoom = $(".addRoom").val();
+    app.addRoom(newRoom);
+    user.room = newRoom;
+    app.changeRoom($(".room:contains(" + newRoom + ")"));
+  });
+
+  // adds friend and styles messages
+  $("#chats").on("click", ".username", function(){
     var userName = $(this).text();
     app.addFriend(userName);
+    app.styleFriend($(".username:contains(" + userName + ")"));
   });
+
+  //
+
+
 };
 
 app.findLastMessageIndex = function(messages){
@@ -105,9 +112,6 @@ app.addNewDOMElements = function(data) {
 
   // update last message
   app.lastMessageID = messages[0].objectId;
-
-  // add event listeners
-  app.addEventListeners();
 }
 
 app.escapeString = function(string) {
@@ -117,7 +121,8 @@ app.escapeString = function(string) {
 };
 
 app.addMessage = function(message){
-  var userName = "<span class='username'>" + app.escapeString(message.username) + "</span>";
+  var classes = user.friendsList[message.username] ? "username friend" : "username";
+  var userName = "<span class='" + classes + "''>" + app.escapeString(message.username) + "</span>";
   var text = "<span id='message'>" + app.escapeString(message.text) + "</span>";
 
   if(app.escapeString(user.room) === "Lobby"){
@@ -155,9 +160,13 @@ app.addFriend = function(friend){
   if (!user.friendsList[friend]) {
     user.friendsList[friend] = friend;
   }
-//add class method
-
 };
+
+// maybe remove friend if already a friend
+app.styleFriend = function(friendSelector) {
+  friendSelector.addClass("friend");
+}
+
 app.handleSubmit = function(){
   //build message to send
   var message = {
