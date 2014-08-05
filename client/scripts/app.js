@@ -2,7 +2,10 @@
 var app = {
   server: "https://api.parse.com/1/classes/chatterbox",
   initialMessageCount: 10,
-  lastMessageID: undefined
+  lastMessageID: undefined,
+  rooms: {
+    lobby:"lobby"
+  }
 };
 
 var user = {
@@ -14,7 +17,7 @@ var user = {
 //fetch initial messages, display them, kickoff fetch loop
 app.init = function(){
   $(document).ready(function(){
-    app.fetch();
+    setInterval(app.fetch, 2000);
   });
 };
 
@@ -42,22 +45,21 @@ app.fetch = function(){
     type: "GET",
     contentType: "jsonp",
     data: { order: "-createdAt" },
-    success: app.addNewestMessages,
+    success: app.addNewDOMElements,
     failure: function(data) {
       console.log("fetch failed");
     }
   });
 };
 
-// app.afterGET = function(data) {
-//   app.addNewestMessages(data);
-//   app.addEventListeners;
-// };
-
 app.addEventListeners = function() {
   $(".username").on("click", function(){
     var userName = $(this).text();
     app.addFriend(userName);
+  });
+
+  $(".room").on("click", function(){
+    console.log("li");
   });
 };
 
@@ -73,7 +75,7 @@ app.findLastMessageIndex = function(messages){
 };
 
 //TODO: handle escaping
-app.addNewestMessages = function(data) {
+app.addNewDOMElements = function(data) {
   var messages = data.results;
   var lastIndex = app.initialMessageCount;
 
@@ -86,6 +88,7 @@ app.addNewestMessages = function(data) {
   // iterate over new messages to prepend to DOM
   for (var i = lastIndex - 1; i >= 0; i--) {
     app.addMessage(messages[i]);
+    app.addRoom(messages[i].roomname);
   }
 
   // update last message
@@ -95,9 +98,15 @@ app.addNewestMessages = function(data) {
   app.addEventListeners();
 }
 
+app.escapeString = function(string) {
+  if(string){
+    return string.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+};
+
 app.addMessage = function(message){
-  var user = "<span class='username'>" + message.username + "</span>";
-  var text = "<span id='message'>" + "'"+ message.text + "'" + "</span>";
+  var user = "<span class='username'>" + app.escapeString(message.username) + "</span>";
+  var text = "<span id='message'>" + app.escapeString(message.text) + "</span>";
   // var room = "<span class='room'>" + message.room + "</span>";
 
   $("#chats").prepend("<div>"+ user + ": " + text + "</div>");
@@ -108,7 +117,11 @@ app.clearMessages = function(){
 };
 
 app.addRoom = function(lobbyName){
-  $("#roomSelect").append("<div>" + lobbyName + "</div>");
+  //if room does not exist
+  if (!app.rooms[lobbyName] && lobbyName !== undefined && lobbyName !== "") {
+    $("#roomSelect").append("<div class='room'>" + lobbyName + "</div>");
+    app.rooms[lobbyName] = lobbyName;
+  }
 };
 
 app.addFriend = function(friend){

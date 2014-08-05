@@ -8,6 +8,7 @@
     <!-- dependencies -->
     <script src="bower_components/jquery/jquery.min.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/Sanitize.js/lib/sanitize.js"></script>
     <!-- your scripts -->
     <script src="scripts/config.js"></script>
     <script src="scripts/app.js"></script>
@@ -21,7 +22,10 @@
       </form>
       <!-- Your HTML goes here! -->
       <div id="chats"></div>
-      <div id="roomSelect"></div>
+      <h3>Room Select</h3>
+      <div id="roomSelect">
+        <li class="currentRoom">Lobby</li>
+      </div>
     </div>
   </body>
 </html>
