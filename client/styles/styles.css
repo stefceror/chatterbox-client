@@ -1,18 +1,20 @@
 body {
-    background: #eee;
+    background: LightSeaGreen;
     text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
 }
 
 #main {
-    width: 500px;
+    width: 800px;
+    height: 600px;
     margin: auto;
     text-align: left;
     background: white;
     padding: 50px 60px;
     border: solid #ddd;
     border-width: 0 1px 1px 1px;
+    /*overflow:auto;*/
 }
 
 #main h1 {
@@ -46,6 +48,7 @@ body {
     line-height: 13px;
 }
 
+
 form {
     padding: 20px;
     padding-left: 0;
@@ -59,18 +62,53 @@ form input[type=text] {
     padding: 5px;
 }
 
-.chat {
+#chats {
     padding: 5px;
     margin-bottom: 5px;
+    margin-right: 0px;
     background-color: #eee;
+    width:500px;
+    height:450px;
+    float:left;
+    overflow:auto;
 }
 
-.chat .username {
+.roomContainer{
+    margin:10px 0px;
+}
+.currentRoom {
+    color: MediumPurple;
+}
+
+.friend {
+    color: CornflowerBlue;
+    font-weight: bold;
+}
+
+.self {
+    color: LightCoral;
+}
+
+#chats .username {
     font-weight: 800;
 }
 
-.chat:hover {
+#chats:hover {
     background-color: #ddd;
+}
+
+#friendsList {
+    float:right;
+    width: 250px;
+    height: 225px;
+    margin: auto;
+}
+
+#roomSelect {
+    float:right;
+    width: 250px;
+    height: 225px;
+    margin: auto;
 }
 
 .spinner {
